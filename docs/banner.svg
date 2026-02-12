@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Workout API banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="pulse" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a3e635"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bg)"/>
+
+  <g opacity="0.35">
+    <circle cx="140" cy="90" r="60" fill="#0ea5e9"/>
+    <circle cx="1020" cy="70" r="45" fill="#22c55e"/>
+    <circle cx="1060" cy="270" r="70" fill="#0ea5e9"/>
+    <circle cx="180" cy="300" r="40" fill="#22c55e"/>
+  </g>
+
+  <g>
+    <text x="80" y="150" font-family="Verdana, Arial, sans-serif" font-size="48" fill="#e5e7eb" font-weight="700">Workout API</text>
+    <text x="80" y="200" font-family="Verdana, Arial, sans-serif" font-size="20" fill="#cbd5f5">NestJS + Supabase + Hexagonal Architecture</text>
+  </g>
+
+  <g transform="translate(80 240)">
+    <rect width="520" height="6" fill="#334155" rx="3"/>
+    <rect width="140" height="6" fill="url(#pulse)" rx="3">
+      <animate attributeName="width" values="80;520;120" dur="6s" repeatCount="indefinite" />
+    </rect>
+  </g>
+</svg>

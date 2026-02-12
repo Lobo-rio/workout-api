@@ -1,0 +1,2 @@
+export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
+export const WORKOUT_REPOSITORY = Symbol('WORKOUT_REPOSITORY');
