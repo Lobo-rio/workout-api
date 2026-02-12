@@ -1,10 +1,13 @@
-import { UserRepository, NewUser } from '../../../domain/repositories/user.repository';
+import {
+  UserRepository,
+  NewUser,
+} from '../../../domain/repositories/user.repository';
 import { User } from '../../../domain/entities/user.entity';
-import { supabase } from './supabase-client';
+import { getSupabaseAdminClient } from './supabase-client';
 
 export class SupabaseUserRepository implements UserRepository {
   async create(user: NewUser): Promise<User> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseAdminClient()
       .from('users')
       .insert(user)
       .select('*')
@@ -18,7 +21,7 @@ export class SupabaseUserRepository implements UserRepository {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseAdminClient()
       .from('users')
       .select('*')
       .eq('email', email)
@@ -32,7 +35,7 @@ export class SupabaseUserRepository implements UserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseAdminClient()
       .from('users')
       .select('*')
       .eq('id', id)

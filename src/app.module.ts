@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,6 +12,9 @@ import { CalorieCalculator } from './domain/services/calorie-calculator';
 import { WorkoutsController } from './infra/http/controllers/workouts.controller';
 import { DashboardController } from './infra/http/controllers/dashboard.controller';
 import { ProfileController } from './infra/http/controllers/profile.controller';
+import { AuthController } from './infra/http/controllers/auth.controller';
+import { AuthService } from './infra/auth/auth.service';
+import { JwtStrategy } from './infra/auth/jwt.strategy';
 import { UserEntity } from './infra/database/typeorm/entities/user.entity';
 import { ExerciseEntity } from './infra/database/typeorm/entities/exercise.entity';
 import { WorkoutPlanEntity } from './infra/database/typeorm/entities/workout-plan.entity';
@@ -31,12 +35,14 @@ import { TypeOrmWorkoutRepository } from './infra/database/typeorm/repositories/
       logging: process.env.NODE_ENV === 'development',
     }),
     TypeOrmModule.forFeature([UserEntity, ExerciseEntity, WorkoutPlanEntity]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [
     AppController,
     WorkoutsController,
     DashboardController,
     ProfileController,
+    AuthController,
   ],
   providers: [
     AppService,
@@ -45,6 +51,8 @@ import { TypeOrmWorkoutRepository } from './infra/database/typeorm/repositories/
     GenerateWorkoutPlanUseCase,
     CalculateDailyCaloriesUseCase,
     GetDashboardDataUseCase,
+    AuthService,
+    JwtStrategy,
     { provide: USER_REPOSITORY, useClass: TypeOrmUserRepository },
     { provide: WORKOUT_REPOSITORY, useClass: TypeOrmWorkoutRepository },
   ],

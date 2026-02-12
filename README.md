@@ -32,6 +32,14 @@ Campos obrigatorios (TypeORM + PostgreSQL):
 - `CORS_ORIGIN` - Origem CORS
 - `PORT` - Porta NestJS
 
+Campos obrigatorios (Supabase Auth):
+
+- `SUPABASE_URL` - URL do projeto Supabase (ex: http://127.0.0.1:54321)
+- `SUPABASE_SERVICE_ROLE_KEY` - Service role key (para admin)
+- `SUPABASE_ANON_KEY` - Anon key (para auth)
+
+**Nota:** A validacao de JWT usa ES256 com JWKS (chaves publicas) via endpoint `/.well-known/jwks.json` do Supabase.
+
 Exemplo com Supabase local:
 
 ```dotenv
@@ -40,6 +48,9 @@ DATABASE_PORT=54322
 DATABASE_NAME=postgres
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
+SUPABASE_URL=http://127.0.0.1:54321
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-anon-key
 CORS_ORIGIN=http://localhost:3000
 PORT=3001
 ```
@@ -92,6 +103,72 @@ npm run test:e2e
 - **Database:** PostgreSQL com TypeORM ORM e migrations automaticas.
 - **HTTP:** controllers protegidos com `JwtAuthGuard`.
 - **Seguranca:** Helmet, Rate Limit, CORS.
+- **Autenticacao:** rotas de sign-in/sign-out via Supabase Auth com ES256 JWT.
+- **Validacao:** Zod schemas com exception filter customizado.
+- **Testes:** unitarios (10 testes) e E2E (8 testes).
+
+## 🔐 Autenticacao
+
+### POST /auth/sign-in
+
+Requer email e senha de usuario cadastrado no Supabase Auth.
+
+```bash
+curl --request POST \
+  --url http://localhost:3001/auth/sign-in \
+  --header 'Content-Type: application/json' \
+  --data '{"email":"user@example.com","password":"password123"}'
+```
+
+Resposta:
+
+```json
+{
+  "accessToken": "...",
+  "refreshToken": "...",
+  "expiresIn": 3600,
+  "tokenType": "bearer",
+  "user": {
+    "id": "...",
+    "email": "gsilvamedeiros@gmail.com"
+  }
+}
+```
+
+### POST /auth/sign-out
+
+Requer access e refresh tokens obtidos no sign-in.
+
+```bash
+curl --request POST \
+  --url http://localhost:3001/auth/sign-out \
+  --header 'Content-Type: application/json' \
+  --data '{"accessToken":"<access>","refreshToken":"<refresh>"}'
+```
+
+### Acessar endpoints protegidos
+
+Use o access token no header Authorization:
+
+```bash
+curl --request GET \
+  --url http://localhost:3001/profile/me \
+  --header 'Authorization: Bearer <access_token>'
+```
+
+### Detalhes tecnicos
+
+A autenticacao usa:
+
+- **Algoritmo:** ES256 (ECDSA com curva P-256)
+- **Validacao:** JWKS via endpoint `/.well-known/jwks.json` do Supabase
+- **Biblioteca:** `jwks-rsa` para cache e validacao de chaves publicas
+- **Estrategia:** JWT Strategy do Passport com validacao automatica
+- **Guards:** `JwtAuthGuard` protege endpoints restritos
+- **Schemas:** Zod para validacao de entrada (email/senha)
+- **Error handling:** Exception filter customizado para erros de validacao
+
+O token gerado pelo Supabase e valido por 3600 segundos (1 hora).
 
 ## 🗄️ Banco de Dados (TypeORM)
 
@@ -100,6 +177,7 @@ npm run test:e2e
 As entidades estao em `src/infra/database/typeorm/entities/`:
 
 **UserEntity** (`user.entity.ts`)
+
 ```typescript
 @Entity('users')
 export class UserEntity {
@@ -130,6 +208,7 @@ export class UserEntity {
 ```
 
 **ExerciseEntity** (`exercise.entity.ts`)
+
 ```typescript
 @Entity('exercises')
 export class ExerciseEntity {
@@ -148,6 +227,7 @@ export class ExerciseEntity {
 ```
 
 **WorkoutPlanEntity** (`workout-plan.entity.ts`)
+
 ```typescript
 @Entity('workouts')
 export class WorkoutPlanEntity {
@@ -176,6 +256,7 @@ export class WorkoutPlanEntity {
 Os repositorios em `src/infra/database/typeorm/repositories/` implementam as interfaces de dominio:
 
 **TypeOrmUserRepository**
+
 ```typescript
 @Injectable()
 export class TypeOrmUserRepository implements UserRepository {
@@ -215,6 +296,7 @@ export class TypeOrmUserRepository implements UserRepository {
 ```
 
 **TypeOrmWorkoutRepository**
+
 ```typescript
 @Injectable()
 export class TypeOrmWorkoutRepository implements WorkoutRepository {
@@ -229,7 +311,10 @@ export class TypeOrmWorkoutRepository implements WorkoutRepository {
     return this.toWorkoutPlan(saved);
   }
 
-  async findByUserAndWeek(userId: string, semana: number): Promise<WorkoutPlan | null> {
+  async findByUserAndWeek(
+    userId: string,
+    semana: number,
+  ): Promise<WorkoutPlan | null> {
     const entity = await this.repository.findOne({
       where: { userId, semana },
     });
@@ -271,6 +356,7 @@ npm run migration:revert
 ```
 
 **Migracoes atuais:**
+
 - `CreateUsersTable` - Tabela users com UUID PK, email unico, campos numericos
 - `CreateExercisesTable` - Tabela exercises com MET decimal
 - `CreateWorkoutsTable` - Tabela workouts com FK para users, campo JSONB exerciciosPorDia
@@ -350,6 +436,7 @@ export class ProfileController {
 ```
 
 **Beneficios:**
+
 - **Dominio isolado:** sem dependencias de framework
 - **Testavel:** mocks faceis de TypeORM repositories
 - **Flexivel:** trocar TypeORM por Prisma sem afetar dominio

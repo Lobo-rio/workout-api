@@ -8,6 +8,9 @@ describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
+    process.env.SUPABASE_JWT_SECRET = 'test-secret';
+    process.env.SUPABASE_URL = 'http://localhost:54323';
+    process.env.SUPABASE_ANON_KEY = 'anon-key';
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();

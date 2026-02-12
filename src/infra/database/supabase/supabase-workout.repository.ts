@@ -1,10 +1,12 @@
 import { WorkoutRepository } from '../../../domain/repositories/workout.repository';
 import { WorkoutPlan } from '../../../domain/entities/workout-plan.entity';
-import { supabase } from './supabase-client';
+import { getSupabaseAdminClient } from './supabase-client';
 
 export class SupabaseWorkoutRepository implements WorkoutRepository {
   async save(plan: WorkoutPlan): Promise<void> {
-    const { error } = await supabase.from('workouts').insert(plan);
+    const { error } = await getSupabaseAdminClient()
+      .from('workouts')
+      .insert(plan);
     if (error) {
       throw new Error(error.message);
     }
@@ -14,7 +16,7 @@ export class SupabaseWorkoutRepository implements WorkoutRepository {
     userId: string,
     semana: number,
   ): Promise<WorkoutPlan | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseAdminClient()
       .from('workouts')
       .select('*')
       .eq('userId', userId)
@@ -29,7 +31,7 @@ export class SupabaseWorkoutRepository implements WorkoutRepository {
   }
 
   async listByUser(userId: string): Promise<WorkoutPlan[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseAdminClient()
       .from('workouts')
       .select('*')
       .eq('userId', userId);

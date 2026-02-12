@@ -6,6 +6,9 @@ describe('AppController', () => {
   let appController: AppController;
 
   beforeEach(async () => {
+    process.env.SUPABASE_JWT_SECRET = 'test-secret';
+    process.env.SUPABASE_URL = 'http://localhost:54323';
+    process.env.SUPABASE_ANON_KEY = 'anon-key';
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
       providers: [AppService],
