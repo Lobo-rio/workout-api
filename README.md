@@ -133,7 +133,7 @@ npm run test
 npm run test:e2e
 ```
 
-## 🧱 O que foi desenvolvido
+## 🧱 Funcionalidades Implementadas
 
 - **Dominio:** entidades `User`, `Exercise`, `WorkoutPlan`.
 - **Value objects:** `sexo`, `objetivo`.
@@ -143,9 +143,13 @@ npm run test:e2e
 - **Database:** PostgreSQL com TypeORM ORM e migrations automaticas.
 - **HTTP:** controllers protegidos com `JwtAuthGuard`.
 - **Seguranca:** Helmet, Rate Limit, CORS.
-- **Autenticacao:** rotas de sign-in/sign-out via Supabase Auth com ES256 JWT.
-- **Validacao:** Zod schemas com exception filter customizado.
-- **Testes:** unitarios (10 testes) e E2E (8 testes).
+- **Autenticacao:**
+  - **Sign-in** (`POST /auth/sign-in`): autentica usuario com email/senha via Supabase Auth
+  - **Sign-out** (`POST /auth/sign-out`): invalida sessao e revoga tokens
+  - **JWT Strategy**: validacao ES256 com JWKS (chaves publicas do Supabase)
+  - **Guards**: protecao de rotas com `JwtAuthGuard` usando tokens do Supabase
+- **Validacao:** Zod schemas com exception filter customizado para retornar erros formatados.
+- **Testes:** unitarios (10 testes) e E2E (8 testes) cobrindo autenticacao e endpoints protegidos.
 
 ## 🔐 Autenticacao
 
