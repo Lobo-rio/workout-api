@@ -12,13 +12,51 @@ Backend com arquitetura hexagonal e integracao com Supabase. Inclui regra de neg
 
 ## ✅ Passo a passo
 
-### 📦 1) Instalar dependencias
+### � 1) Configurar Supabase Local
+
+O projeto usa Supabase localmente através de containers Docker. Isso permite desenvolver sem depender de serviços externos.
+
+**Inicializar o Supabase:**
+
+```bash
+npx supabase init
+```
+
+**Iniciar os containers do Supabase:**
+
+```bash
+npx supabase start
+```
+
+Este comando iniciará os seguintes serviços:
+
+- **PostgreSQL** (porta 54322): banco de dados
+- **API REST/Auth** (porta 54321): endpoints REST e autenticação
+- **Studio** (porta 54323): interface visual de gerenciamento
+- **Mailpit** (porta 54324): captura de emails para testes
+- **GraphQL** (porta 54321): endpoint GraphQL
+
+**Verificar status dos containers:**
+
+```bash
+npx supabase status
+```
+
+Este comando exibe as URLs, portas e credenciais (anon key, service role key) necessárias.
+
+**Parar os containers:**
+
+```bash
+npx supabase stop
+```
+
+### 📦 2) Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 🔐 2) Atualizar variaveis de ambiente
+### 🔐 3) Atualizar variaveis de ambiente
 
 Edite o arquivo `.env` com os valores reais. Use `.env.example` como base.
 
@@ -55,7 +93,9 @@ CORS_ORIGIN=http://localhost:3000
 PORT=3001
 ```
 
-### 📊 3) Executar migracoes
+**Importante:** Use o comando `npx supabase status` para obter os valores corretos de `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY`.
+
+### 📊 4) Executar migracoes
 
 TypeORM aguarda as migracoes para criar schema do banco:
 
@@ -75,7 +115,7 @@ Se precisar reverter:
 npm run migration:revert
 ```
 
-### 🚀 4) Rodar o projeto
+### 🚀 5) Rodar o projeto
 
 ```bash
 npm run start:dev
@@ -83,7 +123,7 @@ npm run start:dev
 
 A API estara disponivel em `http://localhost:3001`
 
-### 🧪 5) Rodar testes
+### 🧪 6) Rodar testes
 
 ```bash
 # unitarios
@@ -170,7 +210,76 @@ A autenticacao usa:
 
 O token gerado pelo Supabase e valido por 3600 segundos (1 hora).
 
-## 🗄️ Banco de Dados (TypeORM)
+## � Supabase
+
+### O que é?
+
+Supabase é uma plataforma open-source que fornece backend-as-a-service. Este projeto usa Supabase localmente através de containers Docker, incluindo:
+
+- **PostgreSQL**: banco de dados relacional
+- **Auth**: sistema de autenticação (sign-in/sign-up/JWT)
+- **REST API**: API automática para as tabelas
+- **Studio**: interface visual para gerenciar o banco
+
+### Comandos úteis
+
+```bash
+# Inicializar (primeira vez)
+npx supabase init
+
+# Iniciar containers
+npx supabase start
+
+# Ver status e credenciais
+npx supabase status
+
+# Parar containers
+npx supabase stop
+
+# Resetar banco de dados
+npx supabase db reset
+```
+
+### URLs e Portas
+
+Após iniciar com `npx supabase start`, os seguintes serviços estarão disponíveis:
+
+**Development Tools:**
+
+- Studio: `http://127.0.0.1:54323`
+- Mailpit (emails): `http://127.0.0.1:54324`
+- MCP: `http://127.0.0.1:54321/mcp`
+
+**APIs:**
+
+- Project URL: `http://127.0.0.1:54321`
+- REST API: `http://127.0.0.1:54321/rest/v1`
+- GraphQL: `http://127.0.0.1:54321/graphql/v1`
+
+**Database:**
+
+- PostgreSQL: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+
+### Acessar o Studio
+
+O Studio é a interface visual para gerenciar o Supabase:
+
+```
+http://127.0.0.1:54323
+```
+
+No Studio você pode:
+
+- Visualizar/editar tabelas
+- Gerenciar usuários (Auth)
+- Executar queries SQL
+- Ver logs em tempo real
+
+### Como funciona
+
+Todos os serviços rodam em containers isolados no seu computador. Os dados ficam persistidos localmente, permitindo desenvolvimento offline sem depender de serviços cloud. As credenciais (anon key, service key, JWT secret) são geradas automaticamente no primeiro start.
+
+## �🗄️ Banco de Dados (TypeORM)
 
 ### Entidades TypeORM
 
